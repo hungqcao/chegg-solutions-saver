@@ -41,6 +41,7 @@
             this.txtUrl.Name = "txtUrl";
             this.txtUrl.Size = new System.Drawing.Size(371, 22);
             this.txtUrl.TabIndex = 0;
+            this.txtUrl.Text = "Url";
             // 
             // txtUsername
             // 
@@ -48,6 +49,7 @@
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(100, 22);
             this.txtUsername.TabIndex = 1;
+            this.txtUsername.Text = "Username";
             // 
             // txtPassword
             // 
@@ -56,6 +58,7 @@
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(100, 22);
             this.txtPassword.TabIndex = 2;
+            this.txtPassword.Text = "Password";
             // 
             // btnExecute
             // 
@@ -73,6 +76,7 @@
             this.txtResultFolderPath.Name = "txtResultFolderPath";
             this.txtResultFolderPath.Size = new System.Drawing.Size(100, 22);
             this.txtResultFolderPath.TabIndex = 4;
+            this.txtResultFolderPath.Text = "Output folder path";
             // 
             // MainForm
             // 

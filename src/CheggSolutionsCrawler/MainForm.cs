@@ -100,9 +100,11 @@ namespace WindowsFormsApp1
                 var title = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h3")).FirstOrDefault(_ => _.HasClass("title"))?.InnerText;
 
                 var node = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("ol")).FirstOrDefault(_ => _.HasClass("steps"));
+                var chapterText = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h2")).FirstOrDefault(_ => _.GetAttributeValue("aria-pressed", "").Equals("true")).InnerText;
+                System.IO.Directory.CreateDirectory($"{txtResultFolderPath.Text}\\{chapterText}");
                 if (title != null && node != null)
                 {
-                    WriteToFile($"{txtResultFolderPath.Text}\\{title}.html", node.OuterHtml);
+                    WriteToFile($"{txtResultFolderPath.Text}\\{chapterText}\\{title}.html", node.OuterHtml);
                     break;
                 }
                 else
@@ -111,7 +113,7 @@ namespace WindowsFormsApp1
 
                     if (noSolutionBtn != null)
                     {
-                        WriteToFile($"{txtResultFolderPath.Text}\\{title}-nosolution.html", "no solution");
+                        WriteToFile($"{txtResultFolderPath.Text}\\{chapterText}\\{title}-nosolution.html", "no solution");
                         break;
                     }
 
