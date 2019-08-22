@@ -1,5 +1,5 @@
 # chegg-solutions-saver
-Because Chegg only gave few days to access their solutions for free when I rent their books so I decided to create a web crawler to save all the needed solutions.
+Because Chegg only gave few days (free trial) to access their solutions for free when I rent their books so I decided to create a web crawler to save all the needed solutions.
 # Technologies
 I created this prototype after few hours so I just used simple and easy to implement, but the idea can be replicate in any languages.
 - C# winform (You need to have Visual Studio)
