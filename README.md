@@ -14,10 +14,10 @@ After that, go to Chegg website and grab **the login redirect url of the first s
 Run the application, provide the url into the first box, username, password and finally the result folder.
 
 Step 1: Go to your the solution page that you need to download (remember to log out before doing this)
-![Step 1](images/1.png)
+![Step 1](https://github.com/hungqcao/chegg-solutions-saver/blob/master/images/1.PNG?raw=true)
 
 Step 2: Click **Sign in** and copy the URL:
-![Step 2](images/2.png)
+![Step 2](https://github.com/hungqcao/chegg-solutions-saver/blob/master/images/2.PNG?raw=true)
 
 Step 3: Open the program. Copy the URL to the URL box. Enter your username and password, output folder. Click execute
-![Step 3](images/3.png)
+![Step 3](https://github.com/hungqcao/chegg-solutions-saver/blob/master/images/3.PNG?raw=true)
