@@ -16,4 +16,4 @@ jobs:
     - name: Show current folder
       run: ls
     - name: Build with dotnet
-      run: dotnet build CheggSolutionsCrawlerNetCore\CheggSolutionsCrawlerNetCore.csproj --configuration Release
+      run: dotnet build src/CheggSolutionsCrawlerNetCore/CheggSolutionsCrawlerNetCore.csproj --configuration Release
