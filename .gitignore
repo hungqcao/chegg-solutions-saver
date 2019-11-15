@@ -5,3 +5,7 @@
 /src/.vs/CheggSolutionsCrawler/v15
 /src/CheggSolutionsCrawler/bin/Debug
 /src/CheggSolutionsCrawler/obj
+/src/.vs/CheggSolutionsCrawler
+/src/CheggSolutionsCrawlerNetCore/obj
+/src/CheggSolutionsCrawlerNetCore/bin
+/src/CheggSolutionsCrawler/bin
