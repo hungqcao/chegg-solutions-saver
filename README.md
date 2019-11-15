@@ -1,5 +1,7 @@
 # chegg-solutions-saver
 Because Chegg only gave few days (free trial) to access their solutions for free when I rent their books so I decided to create a web crawler to save all the needed solutions.
+# Presequisites
+You will need to install <a href="https://www.microsoft.com/en-in/download/details.aspx?id=40784" target="_blank"> Visual C++ Runtime 2013</a> in order to run the application.
 # Technologies
 I created this prototype after few hours so I just used simple and easy to implement, but the idea can be replicate in any languages.
 - C# winform (You need to have Visual Studio)
