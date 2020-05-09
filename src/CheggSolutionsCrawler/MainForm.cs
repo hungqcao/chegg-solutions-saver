@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
 
         public async void InitializeChromium()
         {
+
             CefSettings settings = new CefSettings();
             // Initialize cef with the provided settings
             Cef.Initialize(settings);
@@ -96,6 +97,19 @@ namespace WindowsFormsApp1
                 var source = await chromeBrowser.GetSourceAsync();
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
                 htmlDoc.LoadHtml(source);
+
+                if (htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.HasClass("error-msg-lg") && _.GetAttributeValue("style", "").Equals("")) != null)
+                {
+                    MessageBox.Show("Invalid username or password. Try again");
+                    break;
+                }
+
+                var noAccess = htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.Id.Equals("csresubscribemodal"));
+                if (noAccess != null)
+                {
+                    MessageBox.Show("You need access to your solutions in order to crawl");
+                    break;
+                }
 
                 var title = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h3")).FirstOrDefault(_ => _.HasClass("title"))?.InnerText;
 

@@ -31,19 +31,26 @@ namespace CheggSolutionsCrawlerNetCore
 
         public async Task InitializeChromium()
         {
-            // Create a browser component
-            chromeBrowser = new ChromiumWebBrowser(txtUrl.Text);
-            // Add it to the form and fill it to the form window.
-            this.Controls.Add(chromeBrowser);
-            chromeBrowser.Dock = DockStyle.Fill;
-            await LoadPageAsync(chromeBrowser);
-            chromeBrowser.ExecuteScriptAsync($"document.getElementById('emailForSignIn').value = '{txtUsername.Text}';");
-            await LoadPageAsync(chromeBrowser);
-            chromeBrowser.ExecuteScriptAsync($"document.getElementById('passwordForSignIn').value = '{txtPassword.Text}';");
-            await LoadPageAsync(chromeBrowser);
-            chromeBrowser.ExecuteScriptAsync("document.getElementsByName('login')[0].click()");
-            await LoadPageAsync(chromeBrowser);
-            await LoopThroughEachSolution();
+            if (chromeBrowser != null)
+            {
+                await LoopThroughEachSolution();
+            }
+            else
+            {
+                // Create a browser component
+                chromeBrowser = new ChromiumWebBrowser(txtUrl.Text);
+                // Add it to the form and fill it to the form window.
+                this.Controls.Add(chromeBrowser);
+                chromeBrowser.Dock = DockStyle.Fill;
+                await LoadPageAsync(chromeBrowser);
+                chromeBrowser.ExecuteScriptAsync($"document.getElementById('emailForSignIn').value = '{txtUsername.Text}';");
+                await LoadPageAsync(chromeBrowser);
+                chromeBrowser.ExecuteScriptAsync($"document.getElementById('passwordForSignIn').value = '{txtPassword.Text}';");
+                await LoadPageAsync(chromeBrowser);
+                chromeBrowser.ExecuteScriptAsync("document.getElementsByName('login')[0].click()");
+                await LoadPageAsync(chromeBrowser);
+                await LoopThroughEachSolution();
+            }
         }
 
         public Task LoadPageAsync(IWebBrowser browser)
@@ -103,6 +110,13 @@ namespace CheggSolutionsCrawlerNetCore
                 var source = await chromeBrowser.GetSourceAsync();
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
                 htmlDoc.LoadHtml(source);
+
+                var noAccess = htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.Id.Equals("csresubscribemodal"));
+                if(noAccess != null)
+                {
+                    MessageBox.Show("You need access to your solutions in order to crawl");
+                    break;
+                }
 
                 var title = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h3")).FirstOrDefault(_ => _.HasClass("title"))?.InnerText;
 

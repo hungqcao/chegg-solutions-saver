@@ -8,6 +8,10 @@
     <Platforms>x86;x64</Platforms>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CefSharp.WinForms" Version="75.1.143" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
