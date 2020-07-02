@@ -31,13 +31,42 @@ namespace WindowsFormsApp1
             this.Controls.Add(chromeBrowser);
             chromeBrowser.Dock = DockStyle.Fill;
             await LoadPageAsync(chromeBrowser);
+            if (!cbFBLogin.Checked)
+            {
+                await LoginThroughNormalWay();
+            }
+            else
+            {
+                await LoginThroughFacebook();
+            }
+            await LoadPageAsync(chromeBrowser);
+            await LoopThroughEachSolution();
+        }
+
+        private async Task LoginThroughNormalWay()
+        {
             chromeBrowser.ExecuteScriptAsync($"document.getElementById('emailForSignIn').value = '{txtUsername.Text}';");
             await LoadPageAsync(chromeBrowser);
             chromeBrowser.ExecuteScriptAsync($"document.getElementById('passwordForSignIn').value = '{txtPassword.Text}';");
             await LoadPageAsync(chromeBrowser);
             chromeBrowser.ExecuteScriptAsync("document.getElementsByName('login')[0].click()");
             await LoadPageAsync(chromeBrowser);
-            await LoopThroughEachSolution();
+        }
+
+        private async Task LoginThroughFacebook()
+        {
+            var wait = true;
+            var startTime = DateTime.Now;
+            while(wait)
+            {
+                wait = !(await gotIn());
+
+                if (DateTime.Now.Subtract(startTime).TotalMinutes >= 5)
+                {
+                    MessageBox.Show("Couldn't login!");
+                    break;
+                }
+            }
         }
 
         public Task LoadPageAsync(IWebBrowser browser)
@@ -79,7 +108,7 @@ namespace WindowsFormsApp1
             var source = await chromeBrowser.GetSourceAsync();
             var htmlDoc = new HtmlAgilityPack.HtmlDocument();
             htmlDoc.LoadHtml(source);
-            var buttonNext = htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.Name.Equals("button") && _.GetAttributeValue("data-hover", "").Equals("Next"));
+            var buttonNext = GetButtonNext(htmlDoc);
             if (buttonNext != null)
             {
                 chromeBrowser.ExecuteScriptAsync("document.querySelectorAll('[data-hover=Next]')[0].click();");
@@ -87,6 +116,11 @@ namespace WindowsFormsApp1
                 return true;
             }
             return false;
+        }
+
+        private static HtmlNode GetButtonNext(HtmlAgilityPack.HtmlDocument htmlDoc)
+        {
+            return htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.Name.Equals("button") && _.GetAttributeValue("data-hover", "").Equals("Next"));
         }
 
         public async Task Crawl()
@@ -98,23 +132,16 @@ namespace WindowsFormsApp1
                 var htmlDoc = new HtmlAgilityPack.HtmlDocument();
                 htmlDoc.LoadHtml(source);
 
-                if (htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.HasClass("error-msg-lg") && _.GetAttributeValue("style", "").Equals("")) != null)
+                var canCrawl = await CanCrawl();
+                if (!canCrawl)
                 {
-                    MessageBox.Show("Invalid username or password. Try again");
                     break;
                 }
 
-                var noAccess = htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.Id.Equals("csresubscribemodal"));
-                if (noAccess != null)
-                {
-                    MessageBox.Show("You need access to your solutions in order to crawl");
-                    break;
-                }
+                var title = GetTitle(htmlDoc);
 
-                var title = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h3")).FirstOrDefault(_ => _.HasClass("title"))?.InnerText;
-
-                var node = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("ol")).FirstOrDefault(_ => _.HasClass("steps"));
-                var chapterText = htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h2")).FirstOrDefault(_ => _.GetAttributeValue("aria-pressed", "").Equals("true")).InnerText;
+                var node = GetStepsList(htmlDoc);
+                string chapterText = GetChapterText(htmlDoc);
                 System.IO.Directory.CreateDirectory($"{txtResultFolderPath.Text}\\{chapterText}");
                 if (title != null && node != null)
                 {
@@ -136,6 +163,70 @@ namespace WindowsFormsApp1
                 }
             }
             while (wait <= 10);
+        }
+
+        private static string GetChapterText(HtmlAgilityPack.HtmlDocument htmlDoc)
+        {
+            return htmlDoc.DocumentNode.Descendants()
+                .FirstOrDefault(_ => _.Name.Equals("li") && _.HasClass("chapter", "current"))
+                .Descendants()
+                .Where(_ => _.Name.Equals("h2")).FirstOrDefault(_ => _.GetAttributeValue("aria-pressed", "").Equals("true")).InnerText;
+        }
+
+        private HtmlNode GetStepsList(HtmlAgilityPack.HtmlDocument htmlDoc)
+        {
+            return htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("ol")).FirstOrDefault(_ => _.HasClass("steps"));
+        }
+
+        private string GetTitle(HtmlAgilityPack.HtmlDocument htmlDoc)
+        {
+            return htmlDoc.DocumentNode.Descendants().Where(_ => _.Name.Equals("h2")).FirstOrDefault(_ => _.HasClass("title"))?.InnerText;
+        }
+
+        private async Task<bool> gotIn()
+        {
+            var source = await chromeBrowser.GetSourceAsync();
+            var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+            htmlDoc.LoadHtml(source);
+
+            if (htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.HasClass("capp-promo-close-button")) != null)
+            {
+                chromeBrowser.ExecuteScriptAsync("document.getElementsByClassName('capp-promo-close-button')[0].click()");
+            }
+
+            var title = GetTitle(htmlDoc);
+            if(String.IsNullOrWhiteSpace(title))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private async Task<bool> CanCrawl()
+        {
+            var source = await chromeBrowser.GetSourceAsync();
+            var htmlDoc = new HtmlAgilityPack.HtmlDocument();
+            htmlDoc.LoadHtml(source);
+
+            if (htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.HasClass("capp-promo-close-button")) != null)
+            {
+                chromeBrowser.ExecuteScriptAsync("document.getElementsByClassName('capp-promo-close-button')[0].click()");
+            }
+
+            if (htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.HasClass("error-msg-lg") && _.GetAttributeValue("style", "").Equals("")) != null)
+            {
+                MessageBox.Show("Invalid username or password. Try again");
+                return false;
+            }
+
+            var noAccess = htmlDoc.DocumentNode.Descendants().FirstOrDefault(_ => _.Id.Equals("csresubscribemodal"));
+            if (noAccess != null)
+            {
+                MessageBox.Show("You need access to your solutions in order to crawl");
+                return false;
+            }
+
+            return true;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -161,6 +252,11 @@ namespace WindowsFormsApp1
         private void btnExecute_Click(object sender, EventArgs e)
         {
             InitializeChromium();
+        }
+
+        private void txtResultFolderPath_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 
