@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CefSharp.WinForms" Version="75.1.143" />
+    <PackageReference Include="CefSharp.WinForms" Version="98.1.210" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
   </ItemGroup>
   <ItemGroup>
